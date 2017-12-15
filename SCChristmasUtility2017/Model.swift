@@ -11,13 +11,13 @@ import Foundation
 struct LotteryChoice {
     var name:String
     var homeRoom:String
-    var number:Int
+    var number:String
 }
 
 struct BasketChoice {
     var basketNum:Int
     var name:String
     var homeRoom:String
-    var weight:Double
+    var weight:String
 }
 
