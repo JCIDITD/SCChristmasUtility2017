@@ -15,9 +15,11 @@ class ViewController: UIViewController {
     @IBOutlet weak var homeRoomField: UITextField!
     @IBOutlet weak var nameField: UITextField!
     
+    typealias Lottery = (name:String ,homeRoom:String, number:Int)
+    
     var basketA:[BasketChoice]=[]
     var basketB:[BasketChoice]=[]
-    var lottery:[LotteryChoice]=[]
+    var lottery:[Lottery] = []
     
     
     override func viewDidLoad() {
@@ -31,11 +33,14 @@ class ViewController: UIViewController {
             basketB = basketBMemory as! [BasketChoice]
         }
         if let lotteryMemory = UserDefaults.standard.object(forKey: "lottery"){
-            lottery = lotteryMemory as! [LotteryChoice]
+            lottery = lotteryMemory as! [Lottery]
+            print("LOTTERY MEM LOADED")
         }
         
     }
 
+    
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -51,23 +56,29 @@ class ViewController: UIViewController {
         guard homeRoomField.text != "" else {
             return
         }
-        guard basketNumberField.text != "" else {
-            return
-        }
-        
-        switch basketNumberField.text! {
-        case "1":
-            basketA.append(BasketChoice(basketNum: 1, name: nameField.text!, homeRoom: homeRoomField.text!, weight: valueField.text!))
-                UserDefaults.standard.set(basketA, forKey: "basketA")
-        case "2":
-            basketB.append(BasketChoice(basketNum: 2, name: nameField.text!, homeRoom: homeRoomField.text!, weight: valueField.text!))
-                UserDefaults.standard.set(basketB, forKey: "basketB")
-        default:
-            return
-        }
+         let saved:Lottery = (name: nameField.text!, homeRoom: homeRoomField.text!, number: Int(valueField.text!)!)
+        lottery += [saved]
+        print(lottery)
+ 
+        UserDefaults.standard.set(lottery, forKey: "lottery")
     }
     
+    func serializeLottery(choice: Lottery)->[String: Int]{
+        return ["\(choice.homeRoom),\(choice.name)": choice.number]
+    }
+
+    func deserializeLottery(dictionary:[String:Int])->Lottery{
+        return Lottery(
+            String(dictionary.first!.key.split(separator: ",").first!),
+            String(dictionary.first!.key.split(separator: ",").last!),
+            dictionary.first!.value
+        )
+    }
+    
+    
     @IBAction func recordBasketButtonDidPressed(_ sender: UIButton) {
+        
+        
         guard valueField.text != "" else {
             return
         }
@@ -77,8 +88,21 @@ class ViewController: UIViewController {
         guard homeRoomField.text != "" else {
             return
         }
-        lottery.append(LotteryChoice(name: nameField.text!, homeRoom: homeRoomField.text!, number: valueField.text!))
-        UserDefaults.standard.set(lottery, forKey: "lottery")
+        guard basketNumberField.text != "" else {
+            return
+        }
+        
+        switch basketNumberField.text! {
+        case "1":
+            basketA.append(BasketChoice(basketNum: 1, name: nameField.text!, homeRoom: homeRoomField.text!, weight: Double(valueField.text!)!))
+            UserDefaults.standard.set(basketA, forKey: "basketA")
+        case "2":
+            basketB.append(BasketChoice(basketNum: 2, name: nameField.text!, homeRoom: homeRoomField.text!, weight: Double(valueField.text!)!))
+            UserDefaults.standard.set(basketB, forKey: "basketB")
+        default:
+            return
+        }
+        
         
     }
     
@@ -91,6 +115,9 @@ class ViewController: UIViewController {
         valueField.text = ""
         basketNumberField.text = ""
         valueField.text = ""
+    }
+    @IBAction func checkResultButtonDidPressed(_ sender: UIButton) {
+        performSegue(withIdentifier: "toCheckResults", sender: self)
     }
 }
 

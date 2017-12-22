@@ -15,9 +15,11 @@ struct LotteryChoice {
 }
 
 struct BasketChoice {
-    var basketNum:Int
+    
+    
+    var basketNum:Int 
     var name:String
     var homeRoom:String
-    var weight:String
+    var weight:Double
 }
 
